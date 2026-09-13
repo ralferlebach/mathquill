@@ -1,5 +1,9 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+# Builds, lints and tests MathQuill.
+#
+# The browser jobs always upload their full Playwright report — including
+# videos and traces — on success as well as on failure, so a green run can
+# be exported and reviewed. A job only fails on a real test failure:
+# a mismatching assertion or a page that cannot be initialised.
 
 name: mathquill pr linting
 
@@ -27,5 +31,120 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - run: make
+      - run: make basic
       - run: make lint
       - run: npx prettier --check '**/*.{ts,js,css,html}'
+
+  browser-tests:
+    # Existing Mocha unit suite plus the Playwright baseline and matrix
+    # suites, in Chromium.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'npm'
+
+      - run: npm ci
+      - run: make test
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test --project=chromium
+
+      - name: Upload report (success)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-success-chromium-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Upload report (failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failure-chromium-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+          if-no-files-found: warn
+
+  cross-browser:
+    # Firefox and WebKit: CSS table layout, focus handling, keyboard
+    # events and delimiter scaling differ between engines.
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'npm'
+
+      - run: npm ci
+      - run: make test
+      - run: npx playwright install --with-deps firefox webkit
+      - run: npx playwright test --project=firefox --project=webkit
+
+      - name: Upload report (success)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-success-cross-browser-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Upload report (failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failure-cross-browser-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+          if-no-files-found: warn
+
+  visual-regression:
+    # Screenshot comparison. Reference images are rendering-environment
+    # specific: until baselines produced by this job have been committed,
+    # the job reports but does not block. Download the artifact, copy the
+    # -actual images into test/e2e/visual.spec.ts-snapshots/ and commit
+    # them to turn this into a gate.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'npm'
+
+      - run: npm ci
+      - run: make test
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test --project=visual
+
+      - name: Upload visual report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-visual-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+            test/e2e/**/*-snapshots/
+          retention-days: 14
+          if-no-files-found: warn

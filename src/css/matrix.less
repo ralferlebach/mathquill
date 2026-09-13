@@ -1,0 +1,45 @@
+//
+// Matrix environments (\matrix, \pmatrix, \bmatrix,
+// \Bmatrix, \vmatrix, \Vmatrix).
+//
+// The delimiters reuse the existing .mq-bracket-l/.mq-bracket-r
+// machinery: they are absolutely positioned inside the relatively
+// positioned container and their SVG fills 100% of that box, so they
+// scale with the table height without any JavaScript measuring.
+//
+.mq-math-mode {
+  .mq-matrix {
+    vertical-align: middle;
+    margin-left: 0.1em;
+    margin-right: 0.1em;
+  }
+
+  .mq-matrix-middle {
+    display: inline-block;
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
+  }
+
+  .mq-matrix-table {
+    display: inline-table;
+    width: auto;
+    border: none;
+    border-collapse: separate;
+    border-spacing: 0.3em 0.15em;
+    vertical-align: middle;
+
+    // Single-row matrices (row vectors) sit better on the baseline.
+    &.mq-rows-1 {
+      margin-bottom: 1px;
+    }
+  }
+
+  .mq-matrix-table td {
+    border: none;
+    width: auto;
+    padding: 0;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+}

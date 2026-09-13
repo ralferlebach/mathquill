@@ -4,3 +4,6 @@ build
 src/intro.js
 src/outro.js
 test/support/jquery-1.5.2.js
+playwright-report
+test-results
+test/e2e/**/*-snapshots

@@ -19,6 +19,7 @@ type EmbedOptionsData = MathQuill.v3.EmbedOptionsData;
 type HandlersWithDirection = MathQuill.v3.HandlersWithDirection;
 type HandlersWithoutDirection = MathQuill.v3.HandlersWithoutDirection;
 type HandlerOptions = MathQuill.v3.HandlerOptions;
+type MatrixInsertOptions = MathQuill.v3.MatrixInsertOptions;
 
 type ConfigOptions = MathQuill.v1.Config | MathQuill.v3.Config;
 

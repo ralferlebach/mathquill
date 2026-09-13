@@ -1,4 +1,5 @@
 {
+  "exclude": ["test/e2e", "playwright.config.ts", "node_modules", "build"],
   "compilerOptions": {
     "noImplicitThis": true,
     "noImplicitAny": true,
@@ -19,6 +20,9 @@
     "importHelpers": true,
     "noEmit": true,
     "pretty": true,
-    "typeRoots": ["./node_modules/@types"]
+    "typeRoots": ["./node_modules/@types"],
+    // Explicit: @types/node is only for the Playwright suites, which are
+    // compiled through test/e2e/tsconfig.json.
+    "types": ["mocha"]
   }
 }

@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MathQuill Matrix Verification</title>
+
+    <link rel="stylesheet" href="../build/mathquill.css" />
+
+    <style>
+      body {
+        max-width: 1100px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        font-family: sans-serif;
+      }
+
+      .test-grid {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 1rem;
+        align-items: start;
+      }
+
+      .math-field {
+        display: block;
+        min-height: 3rem;
+        padding: 1rem;
+      }
+
+      .toolbar {
+        margin-bottom: 0.5rem;
+      }
+
+      .toolbar button {
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+      }
+
+      pre {
+        white-space: pre-wrap;
+        background: #f4f4f4;
+        padding: 0.75rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>MathQuill Matrix Verification</h1>
+
+    <p>
+      This page is used for manual inspection and as the fixture for the
+      Playwright matrix tests. It loads the built artefacts from
+      <code>build/</code>, so run <code>make</code> (or <code>make dev</code>)
+      first.
+    </p>
+
+    <h2>Insert</h2>
+
+    <div class="toolbar">
+      <button type="button" data-matrix="2x2">2 &times; 2</button>
+      <button type="button" data-matrix="3x1">3 &times; 1 Vector</button>
+      <button type="button" data-matrix="1x3">1 &times; 3 Vector</button>
+      <button type="button" data-matrix="3x3">3 &times; 3</button>
+      <button type="button" id="insert-column-vector">
+        insertColumnVector(3)
+      </button>
+      <button type="button" id="insert-row-vector">insertRowVector(3)</button>
+    </div>
+
+    <div class="toolbar">
+      <label for="environment-select">Environment</label>
+      <select id="environment-select">
+        <option value="matrix">matrix</option>
+        <option value="pmatrix">pmatrix</option>
+        <option value="bmatrix" selected>bmatrix</option>
+        <option value="Bmatrix">Bmatrix</option>
+        <option value="vmatrix">vmatrix</option>
+        <option value="Vmatrix">Vmatrix</option>
+      </select>
+    </div>
+
+    <h2>Mutate</h2>
+
+    <div class="toolbar">
+      <button type="button" id="add-row">+ Row (Shift-Enter)</button>
+      <button type="button" id="add-column">+ Column (Shift-Spacebar)</button>
+      <button type="button" id="remove-cell">Backspace</button>
+      <button type="button" id="clear-field">Clear</button>
+    </div>
+
+    <h2>Editable field</h2>
+
+    <span id="matrix-field" class="math-field"></span>
+
+    <h2>Current LaTeX</h2>
+
+    <pre id="latex-output"></pre>
+
+    <h2>Environment examples</h2>
+
+    <div class="test-grid">
+      <strong>matrix</strong>
+      <span id="matrix-example"></span>
+
+      <strong>pmatrix</strong>
+      <span id="pmatrix-example"></span>
+
+      <strong>bmatrix</strong>
+      <span id="bmatrix-example"></span>
+
+      <strong>Bmatrix</strong>
+      <span id="Bmatrix-example"></span>
+
+      <strong>vmatrix</strong>
+      <span id="vmatrix-example"></span>
+
+      <strong>Vmatrix</strong>
+      <span id="Vmatrix-example"></span>
+    </div>
+
+    <h2>Sizes</h2>
+
+    <div class="test-grid">
+      <strong>3 &times; 1</strong>
+      <span id="bmatrix-3x1-example"></span>
+
+      <strong>1 &times; 3</strong>
+      <span id="bmatrix-1x3-example"></span>
+
+      <strong>4 &times; 4</strong>
+      <span id="bmatrix-4x4-example"></span>
+
+      <strong>nested content</strong>
+      <span id="nested-example"></span>
+    </div>
+
+    <script src="../build/mathquill.js"></script>
+
+    <script>
+      var MQ = MathQuill.getInterface(MathQuill.getInterface.MAX);
+
+      var fieldElement = document.getElementById('matrix-field');
+      var latexOutput = document.getElementById('latex-output');
+
+      function showLatex() {
+        if (!field) return;
+        latexOutput.textContent = field.latex();
+      }
+
+      var field = null;
+      field = MQ.MathField(fieldElement, {
+        handlers: {
+          edit: function () {
+            showLatex();
+          }
+        }
+      });
+
+      function environment() {
+        return document.getElementById('environment-select').value;
+      }
+
+      document.querySelectorAll('[data-matrix]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          var parts = button.dataset.matrix.split('x');
+
+          field.insertMatrix({
+            rows: Number(parts[0]),
+            columns: Number(parts[1]),
+            environment: environment()
+          });
+
+          field.focus();
+          showLatex();
+        });
+      });
+
+      document
+        .getElementById('insert-column-vector')
+        .addEventListener('click', function () {
+          field.insertColumnVector(3, environment());
+          field.focus();
+          showLatex();
+        });
+
+      document
+        .getElementById('insert-row-vector')
+        .addEventListener('click', function () {
+          field.insertRowVector(3, environment());
+          field.focus();
+          showLatex();
+        });
+
+      function sendKeystroke(key) {
+        field.focus();
+        field.keystroke(key);
+        showLatex();
+      }
+
+      document.getElementById('add-row').addEventListener('click', function () {
+        sendKeystroke('Shift-Enter');
+      });
+      document
+        .getElementById('add-column')
+        .addEventListener('click', function () {
+          sendKeystroke('Shift-Spacebar');
+        });
+      document
+        .getElementById('remove-cell')
+        .addEventListener('click', function () {
+          sendKeystroke('Backspace');
+        });
+      document
+        .getElementById('clear-field')
+        .addEventListener('click', function () {
+          field.latex('');
+          field.focus();
+          showLatex();
+        });
+
+      var examples = {
+        matrix: String.raw`\begin{matrix}a&b\\c&d\end{matrix}`,
+        pmatrix: String.raw`\begin{pmatrix}a&b\\c&d\end{pmatrix}`,
+        bmatrix: String.raw`\begin{bmatrix}a&b\\c&d\end{bmatrix}`,
+        Bmatrix: String.raw`\begin{Bmatrix}a&b\\c&d\end{Bmatrix}`,
+        vmatrix: String.raw`\begin{vmatrix}a&b\\c&d\end{vmatrix}`,
+        Vmatrix: String.raw`\begin{Vmatrix}a&b\\c&d\end{Vmatrix}`,
+        'bmatrix-3x1': String.raw`\begin{bmatrix}x\\y\\z\end{bmatrix}`,
+        'bmatrix-1x3': String.raw`\begin{bmatrix}x&y&z\end{bmatrix}`,
+        'bmatrix-4x4': String.raw`\begin{bmatrix}1&2&3&4\\5&6&7&8\\9&10&11&12\\13&14&15&16\end{bmatrix}`,
+        nested: String.raw`2\begin{bmatrix}\frac{1}{2}&\sqrt{x}\\x^2&\begin{pmatrix}a\\b\end{pmatrix}\end{bmatrix}+1`
+      };
+
+      Object.keys(examples).forEach(function (name) {
+        MQ.StaticMath(document.getElementById(name + '-example')).latex(
+          examples[name]
+        );
+      });
+
+      showLatex();
+    </script>
+  </body>
+</html>

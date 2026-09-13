@@ -54,6 +54,7 @@ SOURCES_FULL = \
   $(SRC_DIR)/commands/math/advancedSymbols.ts \
   $(SRC_DIR)/commands/math/basicSymbols.ts \
   $(SRC_DIR)/commands/math/commands.ts \
+  $(SRC_DIR)/commands/math/matrix.ts \
   $(SRC_DIR)/commands/math/LatexCommandInput.ts
 
 
@@ -61,7 +62,8 @@ SOURCES_BASIC = \
   $(BASE_SOURCES) \
   $(SRC_DIR)/commands/math.ts \
   $(SRC_DIR)/commands/math/basicSymbols.ts \
-  $(SRC_DIR)/commands/math/commands.ts
+  $(SRC_DIR)/commands/math/commands.ts \
+  $(SRC_DIR)/commands/math/matrix.ts
 
 CSS_DIR = $(SRC_DIR)/css
 CSS_MAIN = $(CSS_DIR)/main.less
@@ -86,6 +88,7 @@ UGLY_JS = $(BUILD_DIR)/mathquill.min.js
 UGLY_BASIC_JS = $(BUILD_DIR)/mathquill-basic.min.js
 
 # programs and flags
+PW_PROJECT ?= chromium
 UGLIFY ?= ./node_modules/.bin/uglifyjs
 UGLIFY_OPTS ?= --mangle --compress hoist_vars=true --comments /maintainers@mathquill.com/
 
@@ -177,13 +180,19 @@ lint:
 	npx tsc --noEmit
   # Make sure that the public, standalone type definitions do not depend on any internal sources.
 	npx tsc --noEmit -p test/tsconfig.public-types-test.json
+  # The Playwright suites are compiled separately (ES modules, modern lib).
+	npx tsc --noEmit -p test/e2e/tsconfig.json
 
-.PHONY: test server benchmark
+.PHONY: test server benchmark e2e e2e-visual
 server:
 	node script/test_server.js
 test: dev $(BUILD_TEST) $(BASIC_JS) $(BASIC_CSS)
 	@echo
 	@echo "** now open test/{unit,visual}.html in your browser to run the {unit,visual} tests. **"
+e2e: test
+	npx playwright test --project=$(PW_PROJECT)
+e2e-visual: test
+	npx playwright test --project=visual
 benchmark: dev $(BUILD_TEST) $(BASIC_JS) $(BASIC_CSS)
 	@echo
 	@echo "** now open benchmark/{render,select,update}.html in your browser. **"

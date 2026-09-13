@@ -19,6 +19,24 @@ declare namespace MathQuill {
       handlers?: HandlerOptions;
     };
 
+    type MatrixEnvironmentName =
+      | 'matrix'
+      | 'pmatrix'
+      | 'bmatrix'
+      | 'Bmatrix'
+      | 'vmatrix'
+      | 'Vmatrix';
+
+    /** Options for EditableMathQuill#insertMatrix. */
+    interface MatrixInsertOptions {
+      /** Number of rows, an integer between 1 and 50. */
+      rows: number;
+      /** Number of columns, an integer between 1 and 50. */
+      columns: number;
+      /** LaTeX environment to use, defaults to 'bmatrix'. */
+      environment?: MatrixEnvironmentName;
+    }
+
     type ExportedLatexSelection = {
       latex: string;
       startIndex: number;
@@ -56,6 +74,22 @@ declare namespace MathQuill {
       keystroke: (key: string, evt?: KeyboardEvent) => EditableMathQuill;
       typedText: (text: string) => EditableMathQuill;
       clearSelection: () => EditableMathQuill;
+      insertMatrix: {
+        (options: MatrixInsertOptions): EditableMathQuill;
+        (
+          rows: number,
+          columns: number,
+          environment?: MatrixEnvironmentName
+        ): EditableMathQuill;
+      };
+      insertColumnVector: (
+        rows: number,
+        environment?: MatrixEnvironmentName
+      ) => EditableMathQuill;
+      insertRowVector: (
+        columns: number,
+        environment?: MatrixEnvironmentName
+      ) => EditableMathQuill;
       getAriaPostLabel: () => string;
       setAriaPostLabel: (str: string, timeout?: number) => EditableMathQuill;
       ignoreNextMousedown: (func: () => boolean) => EditableMathQuill;
@@ -190,6 +224,22 @@ declare namespace MathQuill {
       keystroke: (key: string, evt?: KeyboardEvent) => void;
       typedText: (text: string) => void;
       clearSelection: () => void;
+      insertMatrix: {
+        (options: v3.MatrixInsertOptions): void;
+        (
+          rows: number,
+          columns: number,
+          environment?: v3.MatrixEnvironmentName
+        ): void;
+      };
+      insertColumnVector: (
+        rows: number,
+        environment?: v3.MatrixEnvironmentName
+      ) => void;
+      insertRowVector: (
+        columns: number,
+        environment?: v3.MatrixEnvironmentName
+      ) => void;
       getAriaPostLabel: () => string;
       setAriaPostLabel: (str: string, timeout?: number) => void;
       ignoreNextMousedown: (func: () => boolean) => void;

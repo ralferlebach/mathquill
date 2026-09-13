@@ -455,6 +455,44 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
       return this;
     }
 
+    insertMatrix(
+      optionsOrRows: MatrixInsertOptions | number,
+      columns?: number,
+      environment?: string
+    ) {
+      const options = normalizeMatrixInsertOptions(
+        optionsOrRows,
+        columns,
+        environment
+      );
+      const ctrlr = this.__controller.notify(undefined);
+      const cursor = ctrlr.cursor;
+
+      if (cursor.isTooDeep()) return this;
+
+      const matrix = new Matrix(
+        options.environment,
+        options.rows,
+        options.columns
+      );
+      if (cursor.selection) {
+        const replaced = cursor.replaceSelection();
+        if (replaced) matrix.replaces(replaced);
+      }
+      matrix.createLeftOf(cursor.show());
+      cursor.insAtLeftEnd(matrix.getEnd(L));
+
+      ctrlr.scrollHoriz();
+      if (ctrlr.blurred) cursor.hide().parent.blur(cursor);
+      return this;
+    }
+    insertColumnVector(rows: number, environment?: string) {
+      return this.insertMatrix(rows, 1, environment || 'pmatrix');
+    }
+    insertRowVector(columns: number, environment?: string) {
+      return this.insertMatrix(1, columns, environment || 'pmatrix');
+    }
+
     moveToDirEnd(dir: Direction) {
       this.__controller
         .notify('move')
