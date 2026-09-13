@@ -39,6 +39,13 @@ const KNOWN_UPSTREAM_FAILURES: Record<string, RegExp[]> = {
  * `json` query parameter.
  */
 test.describe('existing MathQuill unit suite', () => {
+  // The whole Mocha suite is one Playwright test, and a few of its scroll assertions depend on
+  // the browser's layout timing: WebKit on a CI runner has failed "scrolls on write" and
+  // "has left overflow class" on a commit that passed the identical suite minutes earlier.
+  // Retrying the suite costs seconds; a persistent failure still fails the job. Elsewhere the
+  // configuration keeps retries at zero on purpose.
+  test.describe.configure({ retries: process.env.CI ? 2 : 0 });
+
   test('all Mocha unit tests pass', async ({ page }) => {
     const pageErrors: string[] = [];
     page.on('pageerror', (error) => pageErrors.push(String(error)));

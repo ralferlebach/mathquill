@@ -136,6 +136,11 @@ declare namespace MathQuill {
       };
 
       restrictMismatchedBrackets?: boolean | 'none';
+      /**
+       * Recognise an operator name only when it is the whole word: "max" becomes the operator,
+       * "Umax" stays an identifier. Defaults to false.
+       */
+      autoOperatorNamesOnlyWholeWord?: boolean;
       typingSlashCreatesNewFraction?: boolean;
       charsThatBreakOutOfSupSub?: string;
       sumStartsWithNEquals?: boolean;

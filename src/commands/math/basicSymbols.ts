@@ -565,6 +565,12 @@ class Letter extends Variable {
 
     let autoOpsLength = autoOps._maxLength || 0;
 
+    // With autoOperatorNamesOnlyWholeWord, a name counts only when it covers the entire run of
+    // letters: "max" is the operator, "Umax", "argmax" and "maximum" are identifiers the user
+    // typed. Without it, a name is matched at any position inside the run, which is the
+    // historical behaviour and stays the default.
+    var wholeWordOnly = !!opts.autoOperatorNamesOnlyWholeWord;
+
     // check for operator names: at each position from left to right, check
     // substrings from longest to shortest
     outer: for (
@@ -572,7 +578,9 @@ class Letter extends Variable {
       first && i < str.length;
       i += 1, first = (first as MQNode)[R]
     ) {
+      if (wholeWordOnly && i > 0) break;
       for (var len = min(autoOpsLength, str.length - i); len > 0; len -= 1) {
+        if (wholeWordOnly && len !== str.length) break;
         var word = str.slice(i, i + len);
         var last: Letter = undefined!; // TODO - TS complaining that we use last before assigning to it
 

@@ -99,6 +99,13 @@ class Options {
   substituteKeyboardEvents: SubstituteKeyboardEvents;
 
   restrictMismatchedBrackets?: boolean | 'none';
+  /**
+   * Only substitute an operator name when it forms the whole run of letters. With this set,
+   * typing "max" still gives the operator, while "Umax", "argmax" and "maximum" stay ordinary
+   * identifiers. Off by default, which keeps the historical behaviour of matching a name at
+   * any position inside a word.
+   */
+  autoOperatorNamesOnlyWholeWord?: boolean;
   typingSlashCreatesNewFraction?: boolean;
   charsThatBreakOutOfSupSub: string;
   sumStartsWithNEquals?: boolean;

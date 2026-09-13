@@ -24,14 +24,14 @@ silently accepted.
 
 ## Editing
 
-| Key                   | Effect                                    |
-| --------------------- | ----------------------------------------- |
-| Left / Right          | move inside the cell, then to the next one |
-| Up / Down             | move to the cell above or below            |
-| Tab / Shift-Tab       | move to the next or previous cell          |
-| Shift-Enter           | insert a row below the current one         |
-| Shift-Spacebar        | insert a column right of the current one   |
-| Backspace / Delete    | delete content; an empty row or column is removed, and a matrix that has shrunk to a single empty cell is removed itself |
+| Key                | Effect                                                                                                                   |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| Left / Right       | move inside the cell, then to the next one                                                                               |
+| Up / Down          | move to the cell above or below                                                                                          |
+| Tab / Shift-Tab    | move to the next or previous cell                                                                                        |
+| Shift-Enter        | insert a row below the current one                                                                                       |
+| Shift-Spacebar     | insert a column right of the current one                                                                                 |
+| Backspace / Delete | delete content; an empty row or column is removed, and a matrix that has shrunk to a single empty cell is removed itself |
 
 ## Public API
 
@@ -101,7 +101,21 @@ environment, and a machine with different fonts produces images that
 disagree with every CI run afterwards. `npm run test:visual:update`
 exists for experimenting locally, not for producing what gets committed.
 
+Snapshot names must not differ only in case. Git keeps `Bmatrix-…png` and `bmatrix-…png` apart,
+a checkout on Windows or macOS does not: one of the pair is lost, and the next CI run reports a
+missing reference image for a file that is in the repository. The environments with capitalised
+names are therefore called `bmatrix-braces` and `vmatrix-double`, and a test in
+`visual.spec.ts` fails if a new name collides.
+
 The comparison allows a 1% pixel ratio (`toHaveScreenshot` in
 `playwright.config.ts`), which absorbs antialiasing noise after a runner
 image update while still catching a moved delimiter or a changed row
 height.
+
+## Identifiers containing an operator name
+
+MathQuill un-italicises an operator name wherever it appears inside a run of letters, so typing
+`Umax` produces `U\max`. For a CAS input that is wrong: `Umax` is one variable. Set
+[`autoOperatorNamesOnlyWholeWord`](Config.md#autooperatornamesonlywholeword) to keep such names
+intact, and `disableAutoSubstitutionInSubscripts` for the same problem inside a subscript
+(`U_max`).

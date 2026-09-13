@@ -139,6 +139,14 @@ If `disableAutoSubstitutionInSubscripts` is `true`, then such expansions are dis
 
 If `disableAutoSubstitutionInSubscripts` is `{except: "log"}`, then such expansions are disabled in all subscripts, _except_ for after `\log`, so users can type `\log_{\pi}(x)` again. Just like [`autoCommands`](#autocommands) above, the `except` property should be a string formatted as a space-delimited list of LaTeX commands.
 
+## autoOperatorNamesOnlyWholeWord
+
+If `autoOperatorNamesOnlyWholeWord` is `false` (default), an operator name is recognised wherever it occurs inside a run of letters, so typing `Umax` gives `U\max` and `cosine` gives `\cos ine`.
+
+If `autoOperatorNamesOnlyWholeWord` is `true`, a name is recognised only when it covers the whole run: `max` is still the operator and `max(x,y)` is still a function call, while `Umax`, `maxU`, `argmax`, `maximum` and `sinvalue` stay ordinary identifiers. A name that was recognised while it was the whole word turns back into letters as soon as the word grows, so typing `sine` ends up as `sine`, not `\sin e`.
+
+Use this where variable names are user data rather than prose — a CAS input, for example, where `Umax` is one variable and splitting it changes the meaning of the answer.
+
 # Handlers
 
 Handlers are called after a specified event. They are called directly on the `handlers` object passed in, preserving the `this` value, so you can do stuff like:

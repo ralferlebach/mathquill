@@ -12,6 +12,10 @@ suite('autoOperatorNames', function () {
     autoCommands: 'sum int',
     disableAutoSubstitutionInSubscripts: { except: 'log' }
   };
+  const wholeWordConfig = {
+    autoCommands: 'sum int',
+    autoOperatorNamesOnlyWholeWord: true
+  };
 
   setup(function () {
     mq = MQ.MathField($('<span></span>').appendTo('#mock')[0]);
@@ -208,6 +212,71 @@ suite('autoOperatorNames', function () {
           MQ.config({ autoOperatorNames: 'pi ' });
         });
       });
+    });
+  });
+
+  suite('autoOperatorNamesOnlyWholeWord', function () {
+    setup(function () {
+      mq.config(wholeWordConfig);
+    });
+
+    function assertTyped(str, expected) {
+      mq.latex('');
+      for (var i = 0; i < str.length; i += 1) mq.typedText(str.charAt(i));
+      assertLatex("typing '" + str + "'", expected);
+    }
+
+    test('a name on its own is still an operator', function () {
+      assertTyped('max', '\\max');
+      assertTyped('min', '\\min');
+      assertTyped('sin', '\\sin');
+      assertTyped('arcosh', '\\operatorname{arcosh}');
+    });
+
+    test('an applied name is still an operator', function () {
+      assertTyped('max(', '\\max\\left(\\right)');
+      assertTyped('sin(x', '\\sin\\left(x\\right)');
+    });
+
+    test('a name inside a longer word stays part of the identifier', function () {
+      assertTyped('Umax', 'Umax');
+      assertTyped('Umin', 'Umin');
+      assertTyped('maxU', 'maxU');
+      assertTyped('argmax', 'argmax');
+      assertTyped('maximum', 'maximum');
+      assertTyped('sinvalue', 'sinvalue');
+      assertTyped('cosine', 'cosine');
+    });
+
+    test('typing past a recognised name gives the identifier back', function () {
+      // "sin" is an operator while it is the whole word and turns back into letters as soon as
+      // the word grows.
+      mq.latex('');
+      mq.typedText('sin');
+      assertLatex("typing 'sin'", '\\sin');
+      mq.typedText('e');
+      assertLatex("typing 'sine'", 'sine');
+    });
+
+    test('the default is unchanged', function () {
+      // config() merges, so the comparison needs a field of its own.
+      var plain = MQ.MathField($('<span></span>').appendTo('#mock')[0]);
+      plain.config(normalConfig);
+      plain.latex('');
+      'Umax'.split('').forEach(function (ch) {
+        plain.typedText(ch);
+      });
+      assert.equal(plain.latex(), 'U\\max', "typing 'Umax' without the option");
+
+      plain.latex('');
+      'cosine'.split('').forEach(function (ch) {
+        plain.typedText(ch);
+      });
+      assert.equal(
+        plain.latex(),
+        '\\cos ine',
+        "typing 'cosine' without the option"
+      );
     });
   });
 });
