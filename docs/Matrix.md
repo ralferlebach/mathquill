@@ -90,11 +90,18 @@ an entry as soon as the underlying bug is fixed.
 
 ## Visual baselines
 
-`test/e2e/visual.spec.ts-snapshots/` is intentionally empty in this
-branch: reference images depend on the rendering environment, and images
-produced on a developer machine will not match a CI runner. The
-`visual-regression` job therefore runs with `continue-on-error` and
-uploads whatever it produced. To turn it into a gate, download the
-artifact of a run, copy the generated images into
-`test/e2e/visual.spec.ts-snapshots/`, commit them and remove
-`continue-on-error` from the job.
+The reference images in `test/e2e/visual.spec.ts-snapshots/` were
+produced by the `visual-regression` job and are committed, so that job is
+a gate: an unintended layout change fails it.
+
+To accept an intended change, take the `-actual` images from the job's
+artifact and commit them as the new references. Do not generate
+references on a developer machine: they depend on the rendering
+environment, and a machine with different fonts produces images that
+disagree with every CI run afterwards. `npm run test:visual:update`
+exists for experimenting locally, not for producing what gets committed.
+
+The comparison allows a 1% pixel ratio (`toHaveScreenshot` in
+`playwright.config.ts`), which absorbs antialiasing noise after a runner
+image update while still catching a moved delimiter or a changed row
+height.

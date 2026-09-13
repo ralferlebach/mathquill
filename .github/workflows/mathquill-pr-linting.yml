@@ -116,14 +116,14 @@ jobs:
           if-no-files-found: warn
 
   visual-regression:
-    # Screenshot comparison. Reference images are rendering-environment
-    # specific: until baselines produced by this job have been committed,
-    # the job reports but does not block. Download the artifact, copy the
-    # -actual images into test/e2e/visual.spec.ts-snapshots/ and commit
-    # them to turn this into a gate.
+    # Screenshot comparison against the reference images in
+    # test/e2e/visual.spec.ts-snapshots/, which were produced by this job and
+    # are committed. It is a gate: a layout change that is not intended fails
+    # here. To accept an intended change, take the -actual images from this
+    # job's artifact and commit them as the new references — do not generate
+    # references on a developer machine.
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    continue-on-error: true
 
     steps:
       - uses: actions/checkout@v4

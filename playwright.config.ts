@@ -20,7 +20,14 @@ export default defineConfig({
   retries: 0,
   workers: 1,
   timeout: 60_000,
-  expect: { timeout: 10_000 },
+  expect: {
+    timeout: 10_000,
+    // The reference images are produced on the CI runner and match a local
+    // Linux Chromium of the same Playwright version exactly. The small
+    // tolerance absorbs antialiasing noise after a runner image update; a
+    // moved bracket or a changed row height is far above it.
+    toHaveScreenshot: { maxDiffPixelRatio: 0.01 }
+  },
 
   reporter: [
     ['list'],

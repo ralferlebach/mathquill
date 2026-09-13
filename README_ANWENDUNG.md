@@ -1,60 +1,50 @@
-# Matrix-/Vektorunterstützung für ralferlebach/mathquill — Auslieferung 02
+# Matrix-/Vektorunterstützung für ralferlebach/mathquill — Auslieferung 03
 
 Branch: `feature/matrix-environments` auf `main` (`bb9974ab`).
 
-## Was sich gegenüber Auslieferung 01 ändert
+## Was gegenüber Auslieferung 02 dazukommt
 
-Nur eines: **`package-lock.json` liegt jetzt bei.** In der ersten ZIP fehlte sie, weshalb in
-der CI jeder Job an `npm ci` scheiterte:
+Die CI-Referenzbilder für die visuelle Regression und die Umstellung des Jobs auf einen echten
+Gate. Am Quellcode der Bibliothek ändert sich nichts.
 
-    npm error Missing: @playwright/test@1.63.0 from lock file
-    npm error Missing: @types/node@22.20.2 from lock file
+* `test/e2e/visual.spec.ts-snapshots/*.png` — zehn Referenzbilder, erzeugt vom
+  `visual-regression`-Job des Laufs 94135632916
+* `.github/workflows/mathquill-pr-linting.yml` — `continue-on-error` beim
+  `visual-regression`-Job entfernt
+* `playwright.config.ts` — `toHaveScreenshot: { maxDiffPixelRatio: 0.01 }`
+* `docs/Matrix.md` — Abschnitt zu den Referenzbildern aktualisiert
 
-Der Quellcode ist unverändert. Wer die 01 bereits eingespielt hat, braucht nur die
-`package-lock.json` und `package.json` aus diesem Archiv.
+## Wenn 02 schon eingespielt ist
 
-## Inhalt
+Dann reicht der kleine Patch:
 
-Dieses Archiv enthält den **vollständigen Quellbaum** des Branches (ohne `node_modules/` und
-`build/`) sowie den Patch. Damit kann nichts mehr versehentlich fehlen.
+```bash
+git am mathquill_visual_baselines_only.patch
+```
 
-## Variante A — Patch anwenden (empfohlen)
+## Von vorn
 
 ```bash
 cd /pfad/zu/mathquill
 git checkout main && git pull
 git checkout -b feature/matrix-environments
-git am mathquill_matrix_environments_02.patch
+git am mathquill_matrix_environments_03.patch
 npm ci
 make && make lint
-npx prettier --check '**/*.{ts,js,css,html}'
 ```
 
-## Variante B — Dateien kopieren
-
-Archivinhalt über den Arbeitsbaum kopieren, dann `npm ci`.
-
-## Tests
-
-```bash
-make test
-npx playwright install --with-deps chromium firefox webkit
-make e2e               # Chromium
-npm run test:e2e:all   # Chromium + Firefox + WebKit
-npm run test:visual    # Screenshots, Baselines siehe docs/Matrix.md
-```
+Alternativ enthält dieses Archiv den vollständigen Quellbaum des Branches (ohne `node_modules/`
+und `build/`) zum Kopieren.
 
 ## Verifiziert
 
-- `npm ci` in einem frischen Checkout dieses Commits: grün
-- `make`, `make basic`, `make lint`, `prettier --check`: grün
-- Mocha: 811 passing (Chromium)
-- Playwright: je 29 Tests grün in Chromium, Firefox und WebKit
-- Firefox (`saneKeyboardEvents copy`) und WebKit (`Digit Grouping`) haben Mocha-Fehlschläge,
-  die auch auf unverändertem `main` auftreten; sie sind im Runner als bekannte Upstream-Fehler
-  geführt, alles andere lässt den Lauf scheitern.
+- `npx playwright test --project=visual` gegen die CI-Bilder: 10 von 10 grün, ohne Abweichung
+- `npx playwright test --project=chromium --project=visual`: 39 grün
+- `make lint`, `prettier --check`: grün
 
-## Noch offen
+## Referenzbilder künftig ändern
 
-Referenz-Screenshots für die visuelle Regression aus dem Artefakt des ersten erfolgreichen
-CI-Laufs committen, danach `continue-on-error` im Job entfernen.
+Nur aus dem Artefakt des `visual-regression`-Jobs übernehmen (`-actual`-Bilder), nie auf einem
+Entwicklungsrechner erzeugen: Bilder von einer Maschine mit anderen Schriften widersprechen
+danach jedem CI-Lauf. `npm run test:visual:update` ist zum lokalen Ausprobieren da, nicht für
+das, was committet wird.
