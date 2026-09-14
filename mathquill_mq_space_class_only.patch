@@ -1,0 +1,187 @@
+From 99c967df728178973084ebfe27577961348ffc56 Mon Sep 17 00:00:00 2001
+From: Ralf Erlebach <dev@example.com>
+Date: Sun, 13 Sep 2026 19:32:29 +0000
+Subject: [PATCH] feat(dom): give the typed space the class mq-space
+
+---
+ docs/Config.md                    |  4 ++++
+ src/commands/math/basicSymbols.ts |  8 +++++++-
+ test/unit/digit-grouping.test.js  | 21 ++++++++++++++++++---
+ 3 files changed, 29 insertions(+), 4 deletions(-)
+
+diff --git a/docs/Config.md b/docs/Config.md
+index 13bfe997..d8de0fff 100644
+--- a/docs/Config.md
++++ b/docs/Config.md
+@@ -147,6 +147,10 @@ If `autoOperatorNamesOnlyWholeWord` is `true`, a name is recognised only when it
+ 
+ Use this where variable names are user data rather than prose — a CAS input, for example, where `Umax` is one variable and splitting it changes the meaning of the answer.
+ 
++## The typed space
++
++With `spaceBehavesLikeTab: false` (the default), typing a space inserts a space symbol, which serialises as the LaTeX control space `\ `. Its span carries the class `mq-space`, so a host application can make the space visible where it matters — in a CAS input, `a b` and `ab` can mean different things and must be distinguishable on screen.
++
+ # Handlers
+ 
+ Handlers are called after a specified event. They are called directly on the `handlers` object passed in, preserving the `this` value, so you can do stuff like:
+diff --git a/src/commands/math/basicSymbols.ts b/src/commands/math/basicSymbols.ts
+index 1c61174d..50b65e48 100644
+--- a/src/commands/math/basicSymbols.ts
++++ b/src/commands/math/basicSymbols.ts
+@@ -863,8 +863,14 @@ LatexCmds.f = class extends Letter {
+ };
+ 
+ // VanillaSymbol's
++// The class is what a host application needs to style a typed space: where spaces carry
++// meaning (a CAS input, for instance), "a b" has to be distinguishable from "ab".
+ LatexCmds[' '] = LatexCmds.space = () =>
+-  new DigitGroupingChar('\\ ', h('span', {}, [h.text(U_NO_BREAK_SPACE)]), ' ');
++  new DigitGroupingChar(
++    '\\ ',
++    h('span', { class: 'mq-space' }, [h.text(U_NO_BREAK_SPACE)]),
++    ' '
++  );
+ 
+ LatexCmds['.'] = () =>
+   new DigitGroupingChar(
+diff --git a/test/unit/digit-grouping.test.js b/test/unit/digit-grouping.test.js
+index 21e10bd0..10589b28 100644
+--- a/test/unit/digit-grouping.test.js
++++ b/test/unit/digit-grouping.test.js
+@@ -61,6 +61,7 @@ suite('Digit Grouping', function () {
+             content: '1'
+           },
+           {
++            classes: 'mq-space',
+             content: '&nbsp;'
+           }
+         ]
+@@ -74,6 +75,7 @@ suite('Digit Grouping', function () {
+         classes: 'mq-root-block mq-show-grouping',
+         content: [
+           {
++            classes: 'mq-space',
+             content: '&nbsp;'
+           },
+           {
+@@ -91,6 +93,7 @@ suite('Digit Grouping', function () {
+         classes: 'mq-root-block mq-show-grouping',
+         content: [
+           {
++            classes: 'mq-space',
+             content: '&nbsp;'
+           },
+           {
+@@ -98,6 +101,7 @@ suite('Digit Grouping', function () {
+             content: '1'
+           },
+           {
++            classes: 'mq-space',
+             content: '&nbsp;'
+           }
+         ]
+@@ -127,6 +131,7 @@ suite('Digit Grouping', function () {
+             content: 'a'
+           },
+           {
++            classes: 'mq-space',
+             content: '&nbsp;'
+           }
+         ]
+@@ -140,6 +145,7 @@ suite('Digit Grouping', function () {
+         classes: 'mq-root-block mq-show-grouping',
+         content: [
+           {
++            classes: 'mq-space',
+             content: '&nbsp;'
+           },
+           {
+@@ -159,6 +165,7 @@ suite('Digit Grouping', function () {
+             content: 'a'
+           },
+           {
++            classes: 'mq-space',
+             content: '&nbsp;'
+           },
+           {
+@@ -175,12 +182,14 @@ suite('Digit Grouping', function () {
+         classes: 'mq-root-block mq-show-grouping',
+         content: [
+           {
++            classes: 'mq-space',
+             content: '&nbsp;'
+           },
+           {
+             content: 'a'
+           },
+           {
++            classes: 'mq-space',
+             content: '&nbsp;'
+           }
+         ]
+@@ -212,6 +221,7 @@ suite('Digit Grouping', function () {
+             content: '.'
+           },
+           {
++            classes: 'mq-space',
+             content: '&nbsp;'
+           },
+           {
+@@ -292,9 +302,11 @@ suite('Digit Grouping', function () {
+         classes: 'mq-root-block mq-show-grouping',
+         content: [
+           {
++            classes: 'mq-space',
+             content: '&nbsp;'
+           },
+           {
++            classes: 'mq-space',
+             content: '&nbsp;'
+           }
+         ]
+@@ -308,12 +320,15 @@ suite('Digit Grouping', function () {
+         classes: 'mq-root-block mq-show-grouping',
+         content: [
+           {
++            classes: 'mq-space',
+             content: '&nbsp;'
+           },
+           {
++            classes: 'mq-space',
+             content: '&nbsp;'
+           },
+           {
++            classes: 'mq-space',
+             content: '&nbsp;'
+           }
+         ]
+@@ -631,7 +646,7 @@ suite('Digit Grouping', function () {
+           { classes: 'mq-digit mq-ellipsis-start', content: '.' },
+           { classes: 'mq-digit mq-ellipsis-middle', content: '.' },
+           { classes: 'mq-digit mq-ellipsis-end', content: '.' },
+-          { content: '&nbsp;' },
++          { classes: 'mq-space', content: '&nbsp;' },
+           { classes: 'mq-digit mq-group-leading-1', content: '6' },
+           { classes: 'mq-digit mq-group-start', content: '7' },
+           { classes: 'mq-digit mq-group-other', content: '8' },
+@@ -651,7 +666,7 @@ suite('Digit Grouping', function () {
+           { classes: 'mq-digit', content: '4' },
+           { classes: 'mq-digit', content: '5' },
+           { classes: 'mq-digit', content: '.' },
+-          { content: '&nbsp;' },
++          { classes: 'mq-space', content: '&nbsp;' },
+           { classes: 'mq-digit', content: '.' },
+           { classes: 'mq-digit', content: '.' },
+           { classes: 'mq-digit', content: '6' },
+@@ -782,7 +797,7 @@ suite('Digit Grouping', function () {
+           { classes: 'mq-digit mq-group-other', content: '3' },
+           { classes: 'mq-digit mq-group-other', content: '4' },
+           { classes: 'mq-comma', content: ',' },
+-          { content: '&nbsp;' },
++          { classes: 'mq-space', content: '&nbsp;' },
+           { classes: 'mq-digit mq-ellipsis-start', content: '.' },
+           { classes: 'mq-digit mq-ellipsis-middle', content: '.' },
+           { classes: 'mq-digit mq-ellipsis-end', content: '.' }
+-- 
+2.43.0
+

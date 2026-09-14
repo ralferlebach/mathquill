@@ -61,6 +61,7 @@ suite('Digit Grouping', function () {
             content: '1'
           },
           {
+            classes: 'mq-space',
             content: '&nbsp;'
           }
         ]
@@ -74,6 +75,7 @@ suite('Digit Grouping', function () {
         classes: 'mq-root-block mq-show-grouping',
         content: [
           {
+            classes: 'mq-space',
             content: '&nbsp;'
           },
           {
@@ -91,6 +93,7 @@ suite('Digit Grouping', function () {
         classes: 'mq-root-block mq-show-grouping',
         content: [
           {
+            classes: 'mq-space',
             content: '&nbsp;'
           },
           {
@@ -98,6 +101,7 @@ suite('Digit Grouping', function () {
             content: '1'
           },
           {
+            classes: 'mq-space',
             content: '&nbsp;'
           }
         ]
@@ -127,6 +131,7 @@ suite('Digit Grouping', function () {
             content: 'a'
           },
           {
+            classes: 'mq-space',
             content: '&nbsp;'
           }
         ]
@@ -140,6 +145,7 @@ suite('Digit Grouping', function () {
         classes: 'mq-root-block mq-show-grouping',
         content: [
           {
+            classes: 'mq-space',
             content: '&nbsp;'
           },
           {
@@ -159,6 +165,7 @@ suite('Digit Grouping', function () {
             content: 'a'
           },
           {
+            classes: 'mq-space',
             content: '&nbsp;'
           },
           {
@@ -175,12 +182,14 @@ suite('Digit Grouping', function () {
         classes: 'mq-root-block mq-show-grouping',
         content: [
           {
+            classes: 'mq-space',
             content: '&nbsp;'
           },
           {
             content: 'a'
           },
           {
+            classes: 'mq-space',
             content: '&nbsp;'
           }
         ]
@@ -212,6 +221,7 @@ suite('Digit Grouping', function () {
             content: '.'
           },
           {
+            classes: 'mq-space',
             content: '&nbsp;'
           },
           {
@@ -292,9 +302,11 @@ suite('Digit Grouping', function () {
         classes: 'mq-root-block mq-show-grouping',
         content: [
           {
+            classes: 'mq-space',
             content: '&nbsp;'
           },
           {
+            classes: 'mq-space',
             content: '&nbsp;'
           }
         ]
@@ -308,12 +320,15 @@ suite('Digit Grouping', function () {
         classes: 'mq-root-block mq-show-grouping',
         content: [
           {
+            classes: 'mq-space',
             content: '&nbsp;'
           },
           {
+            classes: 'mq-space',
             content: '&nbsp;'
           },
           {
+            classes: 'mq-space',
             content: '&nbsp;'
           }
         ]
@@ -631,7 +646,7 @@ suite('Digit Grouping', function () {
           { classes: 'mq-digit mq-ellipsis-start', content: '.' },
           { classes: 'mq-digit mq-ellipsis-middle', content: '.' },
           { classes: 'mq-digit mq-ellipsis-end', content: '.' },
-          { content: '&nbsp;' },
+          { classes: 'mq-space', content: '&nbsp;' },
           { classes: 'mq-digit mq-group-leading-1', content: '6' },
           { classes: 'mq-digit mq-group-start', content: '7' },
           { classes: 'mq-digit mq-group-other', content: '8' },
@@ -651,7 +666,7 @@ suite('Digit Grouping', function () {
           { classes: 'mq-digit', content: '4' },
           { classes: 'mq-digit', content: '5' },
           { classes: 'mq-digit', content: '.' },
-          { content: '&nbsp;' },
+          { classes: 'mq-space', content: '&nbsp;' },
           { classes: 'mq-digit', content: '.' },
           { classes: 'mq-digit', content: '.' },
           { classes: 'mq-digit', content: '6' },
@@ -782,7 +797,7 @@ suite('Digit Grouping', function () {
           { classes: 'mq-digit mq-group-other', content: '3' },
           { classes: 'mq-digit mq-group-other', content: '4' },
           { classes: 'mq-comma', content: ',' },
-          { content: '&nbsp;' },
+          { classes: 'mq-space', content: '&nbsp;' },
           { classes: 'mq-digit mq-ellipsis-start', content: '.' },
           { classes: 'mq-digit mq-ellipsis-middle', content: '.' },
           { classes: 'mq-digit mq-ellipsis-end', content: '.' }

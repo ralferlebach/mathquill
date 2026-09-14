@@ -863,8 +863,14 @@ LatexCmds.f = class extends Letter {
 };
 
 // VanillaSymbol's
+// The class is what a host application needs to style a typed space: where spaces carry
+// meaning (a CAS input, for instance), "a b" has to be distinguishable from "ab".
 LatexCmds[' '] = LatexCmds.space = () =>
-  new DigitGroupingChar('\\ ', h('span', {}, [h.text(U_NO_BREAK_SPACE)]), ' ');
+  new DigitGroupingChar(
+    '\\ ',
+    h('span', { class: 'mq-space' }, [h.text(U_NO_BREAK_SPACE)]),
+    ' '
+  );
 
 LatexCmds['.'] = () =>
   new DigitGroupingChar(

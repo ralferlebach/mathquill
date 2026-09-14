@@ -147,6 +147,10 @@ If `autoOperatorNamesOnlyWholeWord` is `true`, a name is recognised only when it
 
 Use this where variable names are user data rather than prose — a CAS input, for example, where `Umax` is one variable and splitting it changes the meaning of the answer.
 
+## The typed space
+
+With `spaceBehavesLikeTab: false` (the default), typing a space inserts a space symbol, which serialises as the LaTeX control space `\ `. Its span carries the class `mq-space`, so a host application can make the space visible where it matters — in a CAS input, `a b` and `ab` can mean different things and must be distinguishable on screen.
+
 # Handlers
 
 Handlers are called after a specified event. They are called directly on the `handlers` object passed in, preserving the `this` value, so you can do stuff like:
