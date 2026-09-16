@@ -20,6 +20,9 @@ type HandlersWithDirection = MathQuill.v3.HandlersWithDirection;
 type HandlersWithoutDirection = MathQuill.v3.HandlersWithoutDirection;
 type HandlerOptions = MathQuill.v3.HandlerOptions;
 type MatrixInsertOptions = MathQuill.v3.MatrixInsertOptions;
+type MatrixDescription = MathQuill.v3.MatrixDescription;
+type MatrixResizeOptions = MathQuill.v3.MatrixResizeOptions;
+type MatrixResizeResult = MathQuill.v3.MatrixResizeResult;
 
 type ConfigOptions = MathQuill.v1.Config | MathQuill.v3.Config;
 

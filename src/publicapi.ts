@@ -493,6 +493,49 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
       if (ctrlr.blurred) cursor.hide().parent.blur(cursor);
       return this;
     }
+    matrixAtCursor() {
+      const matrix = matrixAtCursor(this.__controller.cursor);
+
+      return matrix ? describeMatrix(matrix) : null;
+    }
+
+    resizeMatrix(options: MatrixResizeOptions) {
+      const ctrlr = this.__controller;
+      const cursor = ctrlr.cursor;
+      const matrix = matrixAtCursor(cursor);
+
+      validateMatrixDimension('rows', options.rows);
+      validateMatrixDimension('columns', options.columns);
+
+      if (!matrix) {
+        return {
+          resized: false,
+          from: null,
+          to: { rows: options.rows, columns: options.columns },
+          cellsLost: 0
+        };
+      }
+
+      const from = { rows: matrix.rowCount, columns: matrix.columnCount };
+      const lost = cellsLostByResize(matrix, options.rows, options.columns);
+
+      if (options.dryRun) {
+        return { resized: false, from: from, to: from, cellsLost: lost };
+      }
+
+      ctrlr.notify(undefined);
+      applyMatrixResize(matrix, options.rows, options.columns, cursor.show());
+      ctrlr.scrollHoriz();
+      if (ctrlr.blurred) cursor.hide().parent.blur(cursor);
+
+      return {
+        resized: true,
+        from: from,
+        to: { rows: matrix.rowCount, columns: matrix.columnCount },
+        cellsLost: lost
+      };
+    }
+
     insertColumnVector(rows: number, environment?: string) {
       return this.insertMatrix(rows, 1, environment || 'pmatrix');
     }

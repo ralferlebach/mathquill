@@ -37,6 +37,40 @@ declare namespace MathQuill {
       environment?: MatrixEnvironmentName;
     }
 
+    /** What EditableMathQuill#matrixAtCursor reports about the matrix under the cursor. */
+    interface MatrixDescription {
+      /** Number of rows. */
+      rows: number;
+      /** Number of columns. */
+      columns: number;
+      /** The LaTeX environment this matrix uses. */
+      environment: MatrixEnvironmentName;
+      /** Cell contents as LaTeX, row-major. */
+      cells: string[][];
+    }
+
+    /** Options for EditableMathQuill#resizeMatrix. */
+    interface MatrixResizeOptions {
+      /** New number of rows, an integer between 1 and 50. */
+      rows: number;
+      /** New number of columns, an integer between 1 and 50. */
+      columns: number;
+      /** Report what would be lost without changing anything. */
+      dryRun?: boolean;
+    }
+
+    /** What EditableMathQuill#resizeMatrix reports. */
+    interface MatrixResizeResult {
+      /** False when the cursor is not inside a matrix; nothing was changed then. */
+      resized: boolean;
+      /** Size before the change, or null when there was no matrix. */
+      from: { rows: number; columns: number } | null;
+      /** Size after the change, or the requested one for a dry run. */
+      to: { rows: number; columns: number };
+      /** How many non-empty cells the change discards. */
+      cellsLost: number;
+    }
+
     type ExportedLatexSelection = {
       latex: string;
       startIndex: number;
@@ -82,6 +116,8 @@ declare namespace MathQuill {
           environment?: MatrixEnvironmentName
         ): EditableMathQuill;
       };
+      matrixAtCursor: () => MatrixDescription | null;
+      resizeMatrix: (options: MatrixResizeOptions) => MatrixResizeResult;
       insertColumnVector: (
         rows: number,
         environment?: MatrixEnvironmentName

@@ -644,6 +644,110 @@ LatexCmds.begin = class extends MathCommand {
 };
 
 /**
+ * Find the matrix the cursor is inside, if any.
+ *
+ * A cell knows its matrix, so walking up from the cursor's block finds the innermost one - which
+ * is the matrix a user would say they are in.
+ */
+function matrixAtCursor(cursor: Cursor): Matrix | null {
+  let node: MQNode | undefined = cursor.parent as MQNode | undefined;
+
+  while (node) {
+    if (node instanceof MatrixCell) {
+      const parent = node.parent;
+      if (parent instanceof Matrix) return parent;
+    }
+    node = node.parent as MQNode | undefined;
+  }
+
+  return null;
+}
+
+/** Describe a matrix for the host application: size, environment and cell contents. */
+function describeMatrix(matrix: Matrix): MatrixDescription {
+  const cells: string[][] = [];
+
+  for (let r = 0; r < matrix.rowCount; r += 1) {
+    const row: string[] = [];
+    for (let c = 0; c < matrix.columnCount; c += 1) {
+      row.push(matrix.cells[r][c].latex());
+    }
+    cells.push(row);
+  }
+
+  return {
+    rows: matrix.rowCount,
+    columns: matrix.columnCount,
+    environment: matrix.environment,
+    cells: cells
+  };
+}
+
+/**
+ * How many filled cells a resize to the given size would discard.
+ *
+ * The host application asks this before it changes anything, so that a student can be warned
+ * rather than surprised.
+ */
+function cellsLostByResize(
+  matrix: Matrix,
+  rows: number,
+  columns: number
+): number {
+  let lost = 0;
+
+  for (let r = 0; r < matrix.rowCount; r += 1) {
+    for (let c = 0; c < matrix.columnCount; c += 1) {
+      if (r < rows && c < columns) continue;
+      if (matrix.cells[r][c].latex().trim() !== '') lost += 1;
+    }
+  }
+
+  return lost;
+}
+
+/**
+ * Grow or shrink a matrix in place.
+ *
+ * Rows and columns are added at the end and start empty; rows and columns beyond the new size
+ * are removed with whatever they contained. The cells that stay keep their content and their
+ * position, which is the whole point of resizing rather than re-inserting.
+ */
+function applyMatrixResize(
+  matrix: Matrix,
+  rows: number,
+  columns: number,
+  cursor: Cursor
+) {
+  while (matrix.columnCount > columns) {
+    matrix.deleteColumn(matrix.columnCount - 1);
+  }
+  while (matrix.rowCount > rows) {
+    matrix.deleteRow(matrix.rowCount - 1);
+  }
+  while (matrix.columnCount < columns) {
+    matrix.insertColumnAfter(
+      matrix.cells[0][matrix.columnCount - 1] as MatrixCell,
+      undefined
+    );
+  }
+  while (matrix.rowCount < rows) {
+    matrix.insertRowAfter(
+      matrix.cells[matrix.rowCount - 1][0] as MatrixCell,
+      undefined
+    );
+  }
+
+  // The cursor may have been in a cell that is gone now.
+  const target = matrix.cells[0][0];
+  cursor.insAtRightEnd(target);
+  matrix.bubble(function (node) {
+    node.reflow();
+    return undefined;
+  });
+}
+
+/**
  * Normalise and validate the arguments of the public matrix API.
  * Accepts both `insertMatrix(3, 2, 'bmatrix')` and the preferred
  * `insertMatrix({ rows: 3, columns: 2, environment: 'bmatrix' })`.
